@@ -23,18 +23,18 @@ def _body_j(j, vals):
         jj,
     )
 
-    return [i, im]
+    return [i, im, xmin, ymin, nxwrap, nywrap]
 
 @jax.jit
 def _body_i(i, vals):
     im, xmin, ymin, nxwrap, nywrap = vals
-    _, im = jax.lax.fori_loop(0, im.shape[1], _body_j, [i, im, xmin, ymin, nxwrap, nywrap])
-    return im
+    _, im, _, _, _, _ = jax.lax.fori_loop(0, im.shape[1], _body_j, [i, im, xmin, ymin, nxwrap, nywrap])
+    return im, xmin, ymin, nxwrap, nywrap
 
 @jax.jit
 def wrap_nonhermitian(im, xmin, ymin, nxwrap, nywrap):
 
-    im = jax.lax.fori_loop(0, im.shape[0], _body_i, [im, xmin, ymin, nxwrap, nywrap])
+    im, _, _, _, _ = jax.lax.fori_loop(0, im.shape[0], _body_i, [im, xmin, ymin, nxwrap, nywrap])
     return im
 
 
